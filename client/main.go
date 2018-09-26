@@ -8,11 +8,13 @@ import (
 )
 
 func main() {
-	transport := http.Transport{}
-	transport.RegisterProtocol("file", http.NewFileTransport(http.Dir(".")))
-	client := http.Client{Transport: &transport}
-
-	resp, err := client.Get("file://./main.go")
+	req, err := http.NewRequest("DELETE", "http://localhost:8080", nil)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	client := http.Client{}
+	resp, err := client.Do(req)
 	if err != nil {
 		log.Println(err)
 		return
