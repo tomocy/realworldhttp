@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"net/http/cookiejar"
 	urllib "net/url"
 )
 
@@ -14,21 +13,18 @@ func main() {
 	url := flag.String("url", "http://localhost:8080", "a url for request")
 	flag.Parse()
 
-	jar, _ := cookiejar.New(nil)
-	cookieURL, err := urllib.Parse(*url)
+	proxyURL, err := urllib.Parse(*url)
 	if err != nil {
 		log.Println(err)
 		return
 	}
-	jar.SetCookies(cookieURL, []*http.Cookie{
-		{Name: "name", Value: "tomocy"},
-	})
-
 	client := http.Client{
-		Jar: jar,
+		Transport: &http.Transport{
+			Proxy: http.ProxyURL(proxyURL),
+		},
 	}
 
-	resp, err := client.Get(*url)
+	resp, err := client.Get("http://tomocy:tomocy@github.com")
 	if err != nil {
 		log.Println(err)
 		return
