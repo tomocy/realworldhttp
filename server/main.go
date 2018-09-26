@@ -37,11 +37,11 @@ func digestAuthenticationHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func addHeaderForClientToTryDigestAuthentication(w http.ResponseWriter) {
-	w.Header().Add("WWW-Authenticate", generateWWWAuthenticateHeaderValueForDigestAuthentication())
+	w.Header().Add("WWW-Authenticate", generateHeaderValueForDigestAuthentication())
 	w.WriteHeader(http.StatusUnauthorized)
 }
 
-func generateWWWAuthenticateHeaderValueForDigestAuthentication() string {
+func generateHeaderValueForDigestAuthentication() string {
 	realm := "Need to be authorized"
 	algorithm := "MD5"
 	qop := "auth"
