@@ -14,10 +14,10 @@ func main() {
 	flag.Parse()
 
 	values := urllib.Values{
-		"query": {"hello world"},
+		"name": {"Name"},
 	}
 
-	resp, err := http.Get(*url + "?" + values.Encode())
+	resp, err := http.PostForm(*url, values)
 	if err != nil {
 		log.Println(err)
 		return
