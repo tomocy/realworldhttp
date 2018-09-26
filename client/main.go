@@ -1,30 +1,18 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
-	urllib "net/url"
 )
 
 func main() {
-	url := flag.String("url", "http://localhost:8080", "a url for request")
-	flag.Parse()
+	transport := http.Transport{}
+	transport.RegisterProtocol("file", http.NewFileTransport(http.Dir(".")))
+	client := http.Client{Transport: &transport}
 
-	proxyURL, err := urllib.Parse(*url)
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	client := http.Client{
-		Transport: &http.Transport{
-			Proxy: http.ProxyURL(proxyURL),
-		},
-	}
-
-	resp, err := client.Get("http://tomocy:tomocy@github.com")
+	resp, err := client.Get("file://./main.go")
 	if err != nil {
 		log.Println(err)
 		return
