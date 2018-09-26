@@ -1,44 +1,34 @@
 package main
 
 import (
-	"bytes"
 	"flag"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
-	"mime/multipart"
 	"net/http"
-	"net/textproto"
-	"os"
+	"net/http/cookiejar"
+	urllib "net/url"
 )
 
 func main() {
 	url := flag.String("url", "http://localhost:8080", "a url for request")
 	flag.Parse()
 
-	var b bytes.Buffer
-	w := multipart.NewWriter(&b)
-	h := make(textproto.MIMEHeader)
-	h.Set("Content-Type", "text/plain")
-	h.Set("Content-Disposition", `form-data; name="message": filename="contents.txt"`)
-	fileWriter, err := w.CreatePart(h)
+	jar, _ := cookiejar.New(nil)
+	cookieURL, err := urllib.Parse(*url)
 	if err != nil {
 		log.Println(err)
 		return
 	}
+	jar.SetCookies(cookieURL, []*http.Cookie{
+		{Name: "name", Value: "tomocy"},
+	})
 
-	file, err := os.Open("contents.txt")
-	if err != nil {
-		log.Println(err)
-		return
+	client := http.Client{
+		Jar: jar,
 	}
-	defer file.Close()
 
-	io.Copy(fileWriter, file)
-	w.Close()
-
-	resp, err := http.Post(*url, w.FormDataContentType(), &b)
+	resp, err := client.Get(*url)
 	if err != nil {
 		log.Println(err)
 		return
